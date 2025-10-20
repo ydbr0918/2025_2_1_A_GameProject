@@ -89,14 +89,21 @@ public class InteractableObject : MonoBehaviour
 
     protected virtual void RemoveHighlight()
     {
-        if (objectRenderer != null && !isHighlighted)
+        // 기존: if (objectRenderer != null && !isHighlighted)
+        if (objectRenderer != null && isHighlighted)
         {
             objectRenderer.material.color = originalColor;
-            objectRenderer.material.SetFloat("_Emission", 0f);
+
+            // Emission 비활성화까지 제대로
+            if (objectRenderer.material.HasProperty("_EmissionColor"))
+            {
+                objectRenderer.material.SetColor("_EmissionColor", Color.black);
+                objectRenderer.material.DisableKeyword("_EMISSION");
+            }
+
             isHighlighted = false;
         }
     }
-
     protected virtual void CollectItem()
     {
         Debug.Log($"{objectName}을(를) 획득했습니다!");

@@ -173,7 +173,7 @@ MonoBehaviour:
   amount: 0
   itemIcon: {fileID: 4544719478112299393}
   amountText: {fileID: 6488772206489313494}
-  emptySlotImage: {fileID: 7624045079492833148}
+  emptySlotImage: {fileID: 0}
   slotButton: {fileID: 8113826505052868750}
 --- !u!1 &8481478397827245749
 GameObject:

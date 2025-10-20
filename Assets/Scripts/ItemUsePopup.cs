@@ -39,7 +39,7 @@ public class ItemUsePopup : MonoBehaviour
         currentItem = item;
         currentSlot = slot;
 
-        itemNameText.text = item.itemName;
+        itemNameText.text = item.itemName;      
         itemIconImage.sprite = item.itemIcon;
 
         useButton.interactable = item.isUsable;
