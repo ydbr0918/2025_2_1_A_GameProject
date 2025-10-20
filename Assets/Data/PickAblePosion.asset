@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 95318e82350d0ef49a89fabe4edefe70, type: 3}
-  m_Name: PickAbleCoin
+  m_Name: PickAblePosion
   m_EditorClassIdentifier: 
-  itemName: "\uACE8\uB4DC \uCF54\uC778"
-  itemIcon: {fileID: 21300000, guid: 93b5b28db06f8d2439c780ec3aeb28d2, type: 3}
+  itemName: "\uD790\uB9C1 \uD3EC\uC158"
+  itemIcon: {fileID: 21300000, guid: 10876d86c0d0c7948ab7c3f219be6325, type: 3}
   maxStack: 99
-  isUsable: 0
-  healAmount: 0
+  isUsable: 1
+  healAmount: 10
