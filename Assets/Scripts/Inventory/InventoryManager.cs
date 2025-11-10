@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,16 +16,15 @@ public class InventoryManager : MonoBehaviour
 
     [Header("Input")]
     public KeyCode inventoryKey = KeyCode.I;
-    private List<InventorySlot> slots = new List<InventorySlot>();
+    private List<InventorySlot> slots = new List<InventorySlot> ();
     private bool isInventoryOpen = false;
-
-
 
     private void Awake()
     {
-        if (Instance == null) Instance = this;
+        if(Instance == null) Instance = this;
         else Destroy(gameObject);
     }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -41,7 +41,6 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
-    //인ㅂㅔㄴ토리 슬ㄹㅗㅅ을 생ㅅㅓㅇ하느ㄴ 함ㅅㅜ
     void CreateInventorySlots()
     {
         for (int i = 0; i < inventorySize; i++)
@@ -62,6 +61,7 @@ public class InventoryManager : MonoBehaviour
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
         }
+
         else
         {
             Cursor.lockState = CursorLockMode.Locked;
@@ -75,19 +75,17 @@ public class InventoryManager : MonoBehaviour
         {
             if (slot.item == item && slot.amount < item.maxStack)
             {
-                int spaceLeft = item.maxStack - slot.amount;
-                int amountToAdd = Mathf.Min(amount, spaceLeft);
+                int SpaceLeft = item.maxStack - slot.amount;
+                int amountToAdd = Mathf.Min(amount, SpaceLeft);
                 slot.AddAmount(amountToAdd);
                 amount -= amountToAdd;
 
-                if (amount <=0)
+                if (amount <= 0)
                 {
                     return true;
                 }
-
             }
         }
-
 
         foreach (InventorySlot slot in slots)
         {
@@ -102,7 +100,7 @@ public class InventoryManager : MonoBehaviour
         return false;
     }
 
-    public void RemoveItem(ItemData item, int amount = 1)
+    public void Removeitem(ItemData item, int amount = 1)
     {
         foreach (InventorySlot slot in slots)
         {
@@ -124,6 +122,6 @@ public class InventoryManager : MonoBehaviour
                 count += slot.amount;
             }
         }
-        return count;
+        return count;   
     }
 }

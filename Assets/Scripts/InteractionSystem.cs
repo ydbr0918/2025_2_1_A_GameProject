@@ -5,39 +5,33 @@ using UnityEngine.UI;
 
 public class InteractionSystem : MonoBehaviour
 {
-
     [Header("상호 작용 설정")]
-    public float interactionRange = 2.0f;                          //상호작용 범위
-    public LayerMask interactionLayerMask = 1;                     //상호작용할 레이어
-    public KeyCode interactionKey = KeyCode.E;                     //상호작용키 (E키)
+    public float interactionRange = 2.0f;       //범위
+    public LayerMask interactionLayerMask = 1;  //레이어
+    public KeyCode interactionKey = KeyCode.E;
 
     [Header("UI 설정")]
-    public Text interactionText;                             //상호작용 UI 텍스트
-    public GameObject interactionUI;                                  //상호작용 UI 패널
+    public Text interactionText;                //UI텍스트
+    public GameObject interactionUI;            //UI패널
 
     private Transform playerTransform;
-    private InteractableObject currentInteractable;                  //감지된 오브젝트 담는 클래스
-
-    // Start is called before the first frame update
+    private InteractableObject currentInteractiable;
     void Start()
     {
         playerTransform = transform;
         HideInteractionUI();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        CheckForInteractables();
-        HandleInteractionInput();
+        CheckForInteactacbles();
+        HandleinteractionInput();
     }
 
-    void CheckForInteractables()
+    void CheckForInteactacbles()
     {
-        Vector3 checkPosition = playerTransform.position + playerTransform.forward * (interactionRange * 0.5f);
-
-        Collider[] hitColliders = Physics.OverlapSphere(checkPosition, interactionRange, interactionLayerMask);
-
+        Vector3 CheckPosition = playerTransform.position + playerTransform.forward * (interactionRange * 0.5f);
+        Collider[] hitColliders = Physics.OverlapSphere(CheckPosition, interactionRange, interactionLayerMask);
         InteractableObject closestInteractable = null;
         float closestDistance = float.MaxValue;
 
@@ -47,7 +41,6 @@ public class InteractionSystem : MonoBehaviour
             if (interactable != null)
             {
                 float distance = Vector3.Distance(playerTransform.position, collider.transform.position);
-
                 Vector3 directionToObject = (collider.transform.position - playerTransform.position).normalized;
                 float angle = Vector3.Angle(playerTransform.forward, directionToObject);
 
@@ -59,19 +52,19 @@ public class InteractionSystem : MonoBehaviour
             }
         }
 
-        if (closestInteractable != currentInteractable)
+        if (closestInteractable != currentInteractiable)
         {
-            if (currentInteractable != null)
+            if (currentInteractiable != null)
             {
-                currentInteractable.OnPlayerExit();
+                currentInteractiable.onPlayerExit();
             }
 
-            currentInteractable = closestInteractable;
+            currentInteractiable = closestInteractable;
 
-            if (currentInteractable != null)
+            if (currentInteractiable != null)
             {
-                currentInteractable.OnPlayerEnter();
-                ShowInteractionUI(currentInteractable.GetInteractionText());
+                currentInteractiable.onPlayerEnter();
+                ShowinteractionUI(currentInteractiable.GetInteractionText());
             }
             else
             {
@@ -80,20 +73,21 @@ public class InteractionSystem : MonoBehaviour
         }
     }
 
-    void HandleInteractionInput()
+    void HandleinteractionInput()
     {
-        if (currentInteractable != null && Input.GetKeyDown(interactionKey))
+        if (currentInteractiable != null && Input.GetKeyDown(interactionKey))
         {
-            currentInteractable.Interact();
+            currentInteractiable.Interact();
         }
     }
 
-    void ShowInteractionUI(string text)
+    void ShowinteractionUI(string text)
     {
         if (interactionUI != null)
         {
             interactionUI.SetActive(true);
         }
+
         if (interactionText != null)
         {
             interactionText.text = text;

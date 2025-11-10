@@ -7,9 +7,9 @@ public class QuestManager : MonoBehaviour
 {
     public static QuestManager Instance;
 
-    [Header("UI 요소들")]
+    [Header("UI 요소들 ")]
     public GameObject questUI;
-    public Text questTitleText;
+    public Text questTitletext;
     public Text questDescriptionText;
     public Text questProgressText;
     public Button completeButton;
@@ -20,7 +20,7 @@ public class QuestManager : MonoBehaviour
     public QuestData currentQuest;
     private int currentQuestIndex = 0;
 
-    void Awake()
+    private void Awake()
     {
         if (Instance == null)
         {
@@ -32,8 +32,6 @@ public class QuestManager : MonoBehaviour
         }
     }
 
-
-    // Start is called before the first frame update
     void Start()
     {
         if (availableQuests.Length > 0)
@@ -42,11 +40,10 @@ public class QuestManager : MonoBehaviour
         }
         if (completeButton != null)
         {
-            completeButton.onClick.AddListener(COmpleteCurrentQuest);
+            completeButton.onClick.AddListener(CompleteCurrentQuest);
         }
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (currentQuest != null && currentQuest.isActive)
@@ -60,9 +57,9 @@ public class QuestManager : MonoBehaviour
     {
         if (currentQuest == null) return;
 
-        if (questTitleText != null)
+        if (questTitletext != null)
         {
-            questTitleText.text = currentQuest.questTitle;
+            questTitletext.text = currentQuest.questTitle;
         }
 
         if (questDescriptionText != null)
@@ -72,19 +69,20 @@ public class QuestManager : MonoBehaviour
 
         if (questProgressText != null)
         {
-            questProgressText.text = currentQuest.GetProgressText();
+            questProgressText.text = currentQuest.GetPogressText();
         }
     }
 
+
     public void StartQuest(QuestData quest)
     {
-        if (quest == null) return;
+        if(quest == null) return;
 
         currentQuest = quest;
         currentQuest.Initialize();
         currentQuest.isActive = true;
 
-        Debug.Log("퀘스트 시작:" + questTitleText);
+        Debug.Log("퀘스트 시작 : " + questTitletext);
         UpdateQuestUI();
         if (questUI != null)
         {
@@ -92,6 +90,7 @@ public class QuestManager : MonoBehaviour
         }
     }
 
+    //배달 퀘스트
     void CheckDeliveryProgress()
     {
         Transform player = GameObject.FindGameObjectWithTag("Player")?.transform;
@@ -99,20 +98,21 @@ public class QuestManager : MonoBehaviour
 
         float distance = Vector3.Distance(player.position, currentQuest.deliveryPosition);
 
-        if (distance <= currentQuest.deliveryRedius)
+        if (distance <= currentQuest.deliveryRedius)    //유저의 거리가 도착범위인지 검사
         {
             if (currentQuest.currentProgress == 0)
             {
-                currentQuest.currentProgress = 1;
+                currentQuest.currentProgress = 1;       //완료
             }
         }
         else
         {
-            currentQuest.currentProgress = 0;
+            currentQuest.currentProgress = 0;           //실패
         }
+       
     }
 
-    //수집 퀘스트 진행
+    //수집 퀘스트
     public void AddCollectProgress(string itemTag)
     {
         if (currentQuest == null || !currentQuest.isActive) return;
@@ -120,10 +120,11 @@ public class QuestManager : MonoBehaviour
         if (currentQuest.questType == QuestType.Collect && currentQuest.targetTag == itemTag)
         {
             currentQuest.currentProgress++;
-            Debug.Log("아이템 수집;" + itemTag);
+            Debug.Log("아이템 수집 : " + itemTag);
         }
     }
 
+    //상호작용 퀘스트
     public void AddInteractProgress(string objectTag)
     {
         if (currentQuest == null || !currentQuest.isActive) return;
@@ -131,16 +132,16 @@ public class QuestManager : MonoBehaviour
         if (currentQuest.questType == QuestType.Interact && currentQuest.targetTag == objectTag)
         {
             currentQuest.currentProgress++;
-            Debug.Log("상호 작용 완료:" + objectTag);
+            Debug.Log("상호작용 완료 : " +  objectTag);   
         }
     }
 
-    public void COmpleteCurrentQuest()
+    //현재 퀘스트 완료
+    public void CompleteCurrentQuest()
     {
-        if (currentQuest == null || !currentQuest.isCompleted) return;
+        if(currentQuest == null || !currentQuest.isCompleted) return;
 
         Debug.Log("퀘스트 완료!" + currentQuest.rewardMessage);
-
         if (completeButton != null)
         {
             completeButton.gameObject.SetActive(false);
@@ -168,7 +169,7 @@ public class QuestManager : MonoBehaviour
             CheckDeliveryProgress();
         }
 
-        if (currentQuest.isComplete() && !currentQuest.isCompleted)
+        if (currentQuest.IsComplete() && !currentQuest.isCompleted)
         {
             currentQuest.isCompleted = true;
 

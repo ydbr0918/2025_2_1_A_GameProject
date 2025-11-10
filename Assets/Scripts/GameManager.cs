@@ -9,19 +9,19 @@ public class GameManager : MonoBehaviour
     public int playerScore = 0;
     public int itemsCollected = 0;
 
-    [Header("UI 참조")]
+    [Header("Ui 참조")]
     public Text scoreText;
     public Text itemCountText;
     public Text gameStatusText;
 
-    public static GameManager Instance;    //싱ㄱㅡㄹ톤 패터ㄴ
+    public static GameManager instance;
 
     private void Awake()
     {
-        if (Instance == null)
+        if (instance == null)
         {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);                  //씬 전호ㅏㄴㅇ 시에도 유지
+            instance = this;
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -32,18 +32,18 @@ public class GameManager : MonoBehaviour
     public void CollectItem()
     {
         itemsCollected++;
-        Debug.Log($"아이템 수집!(총:{itemsCollected}개");
+        Debug.Log($"아이템 수집! (총 : {itemsCollected} 개");
     }
 
     void UpdateUI()
     {
         if (scoreText != null)
         {
-            scoreText.text = "점수:" + playerScore;
+            scoreText.text = "점수 : " + playerScore;
         }
         if (itemCountText != null)
         {
-            itemCountText.text= "아이템:" + itemsCollected + "개";
+            itemCountText.text = "아이템 : " + itemsCollected + "개";
         }
     }
 }

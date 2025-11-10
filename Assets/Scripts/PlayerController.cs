@@ -9,15 +9,14 @@ public class PlayerController : MonoBehaviour
     public float runSpeed = 6f;
     public float rotationSpeed = 10;
 
-    [Header("점프 설정")]
+    [Header("점프설정")]
+    public float landingDuration = 0.3f;
+    public float gravity = -9.81f;
     public float jumpHeight = 2f;
-    public float gravity = -9.81f;                         //중력 속도 추가
-    public float landingDuration = 0.3f;                   //착지 후 착지 지속시간
-
 
     [Header("공격 설정")]
-    public float attackDuration = 0.8f;                              //공격 지속 시간
-    public bool canMoveWhileAttacking = false;                       //공격중 이동 가능 여부
+    public float attackDruation = 0.8f;         //공격 지속 시간
+    public bool canMoveWhileAttacking = false;  //공격중 이동 가능 여부
 
     [Header("컴포넌트")]
     public Animator animator;
@@ -25,18 +24,19 @@ public class PlayerController : MonoBehaviour
     private CharacterController controller;
     private Camera playerCamera;
 
-    //현재 상태
     private float currentSpeed;
-    private bool isAttacking = false;                                 //공격중인지 체크
-    private bool isLanding = false;                                  //착지 중인지 확인
-    private float landingTimer;                                      //착지 타이머
+    private bool isAttacking = false;   //공격중인가
+    private bool isLanding = false;
+    private float landingTimer;
 
     private Vector3 velocity;
     private bool isGrounded;
-    private bool wasGrounded;                                        //이전 프레임이 땅 이였는지
+    private bool wasGrounded;
     private float attackTimer;
 
-    private bool isUIMode = false;
+    private bool isUIMode = false;      //UI 모드 설정
+
+
 
     // Start is called before the first frame update
     void Start()
@@ -48,7 +48,6 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
         if (Input.GetKeyDown(KeyCode.Tab))
         {
             ToggleCursorLock();
@@ -57,22 +56,24 @@ public class PlayerController : MonoBehaviour
         if (!isUIMode)
         {
             CheckGrounded();
-            HandleLanding();
+            HandleLandeing();
             HandleMovement();
+            UpdateAnimator();
             HandleJump();
             HandleAttack();
             UpdateAnimator();
         }
+
         
     }
 
     void CheckGrounded()
     {
-        //이전 상태 저장
+        //이전상태 저장
         wasGrounded = isGrounded;
-        isGrounded = controller.isGrounded;                      //캐릭터 컨트롤러에서 받아온다
+        isGrounded = controller.isGrounded;
 
-        if (!isGrounded && wasGrounded)                             //땅에서 떨어졌을때(지금 프레임은 땅이 아니고, 이전 프레임은 땅)
+        if (!isGrounded && wasGrounded)
         {
             Debug.Log("떨어지기 시작");
         }
@@ -81,20 +82,75 @@ public class PlayerController : MonoBehaviour
         {
             velocity.y = -2f;
 
-            //착지 모션 트리거 및 착지 상태 시작
             if (!wasGrounded && animator != null)
             {
-                //animator.SetTrigger("landTrigger");
+                animator.SetTrigger("landTrigger");
                 isLanding = true;
                 landingTimer = landingDuration;
                 Debug.Log("착지");
             }
         }
     }
+    void HandleMovement()
+    {
+        if ((isAttacking && !canMoveWhileAttacking) || isLanding)
+        {
+            currentSpeed = 0;
+            return;
+        }
+
+        float horizontal = Input.GetAxis("Horizontal");
+        float vertical = Input.GetAxis("Vertical");
+
+        if (horizontal != 0 || vertical != 0)
+        {
+            Vector3 cameraForward = playerCamera.transform.forward;
+            Vector3 cameraRight = playerCamera.transform.right;
+            cameraForward.y = 0;
+            cameraRight.y = 0;
+            cameraForward.Normalize();
+            cameraRight.Normalize();
+
+            Vector3 moveDirection = cameraForward * vertical + cameraRight * horizontal;    //이동 방향 설정
+
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                currentSpeed = runSpeed;
+
+            }
+            else
+            {
+                currentSpeed = walkSpeed;
+            }
+
+            controller.Move(moveDirection * currentSpeed * Time.deltaTime); //캐릭터 컨트롤러의 이동 입력
+
+            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+
+        }
+        else
+        {
+            currentSpeed = 0;
+        }
+    }
+
+    void UpdateAnimator()
+    {
+        //전체 최대 속도 기준으로 0~1 계산
+        float animatorSpeed = Mathf.Clamp01(currentSpeed / runSpeed);
+        animator.SetFloat("Speed", animatorSpeed);
+        animator.SetBool("isGrounded", isGrounded);
+
+        bool isFalling = !isGrounded && velocity.y < 0.1f;
+        animator.SetBool("isFalling", isFalling);
+        animator.SetBool("isLanding", isLanding);
+
+    }
 
     void HandleJump()
     {
-        if (Input.GetButton("Jump") && isGrounded)       //땅 위에 있을때만 점프를 할 수 있다
+        if (Input.GetButtonDown("Jump") && isGrounded)
         {
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
 
@@ -104,59 +160,16 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        if (!isGrounded)                                    //땅에 있지 않을 경우 중력 정용
+        if (!isGrounded)
         {
             velocity.y += gravity * Time.deltaTime;
+
         }
 
-        controller.Move(velocity * Time.deltaTime);
+        controller.Move(velocity *  Time.deltaTime);
     }
 
-    void HandleMovement()              //이동 함수 제작
-    {
-        if ((isAttacking && !canMoveWhileAttacking) || isLanding)
-        {
-            currentSpeed = 0;
-            return;
-        }
-
-        float horizontal = Input.GetAxis("Horizontal");
-        float verical = Input.GetAxis("Vertical");
-
-        if (horizontal != 0 || verical != 0)                //둥중이 하나라도 입력이 있을 때
-        {
-            Vector3 cameraForward = playerCamera.transform.forward;
-            Vector3 cameraRight = playerCamera.transform.right;
-            cameraForward.y = 0;
-            cameraRight.y = 0;
-            cameraForward.Normalize();
-            cameraRight.Normalize();
-
-            Vector3 moveDirection = cameraForward * verical + cameraRight * horizontal;        //이동 방향 설정
-
-            if (Input.GetKey(KeyCode.LeftShift))
-            {
-                currentSpeed = runSpeed;
-            }
-            else
-            {
-                currentSpeed = walkSpeed;
-            }
-
-            controller.Move(moveDirection * currentSpeed * Time.deltaTime);    //캐릭터 컨트롤러의 이동 입력
-
-            //이동 진행 방향으ㅏㄹ 바라보면서 이동
-            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
-        }
-        else
-        {
-            currentSpeed = 0;                                    //이동이 아닐 경우 스피드 0
-        }
-
-    }
-
-    void HandleLanding()
+    void HandleLandeing()
     {
         if (isLanding)
         {
@@ -166,7 +179,6 @@ public class PlayerController : MonoBehaviour
                 isLanding = false;
             }
         }
-
     }
 
     void HandleAttack()
@@ -182,26 +194,13 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha1) && !isAttacking)
         {
             isAttacking = true;
-            attackTimer = attackDuration;
+            attackTimer = attackDruation;
 
             if (animator != null)
             {
                 animator.SetTrigger("attackTrigger");
             }
         }
-    }
-
-    void UpdateAnimator()
-    {
-        //전체 최대 속도(runSpeed) 기준으로 0~1 계산
-        float animatorSpeed = Mathf.Clamp01(currentSpeed / runSpeed);
-        animator.SetFloat("Speed", animatorSpeed);
-        animator.SetBool("isGrounded", isGrounded);
-
-        bool isFalling = !isGrounded && velocity.y < -0.1f;             //캐릭터의 Y축 속도가 음수로 넘어가면 떨어지고 있다고 판단
-        animator.SetBool("isFalling", isFalling);
-        animator.SetBool("isLanding", isLanding);
-
     }
 
     public void SetCursorLock(bool lockCursor)

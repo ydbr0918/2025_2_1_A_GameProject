@@ -10,7 +10,6 @@ public class PickUpItem : InteractableObject
     public override void Interact()
     {
         base.Interact();
-
         if (InventoryManager.Instance != null)
         {
             bool added = InventoryManager.Instance.AddItem(itemData, amount);
@@ -18,8 +17,8 @@ public class PickUpItem : InteractableObject
             if (added)
             {
                 Destroy(gameObject);
+
             }
         }
     }
-
 }

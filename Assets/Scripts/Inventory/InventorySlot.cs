@@ -6,10 +6,9 @@ using UnityEngine.UI;
 public class InventorySlot : MonoBehaviour
 {
     public ItemData item;
-
     public int amount;
 
-    [Header("UI References")]
+    [Header("UI Referens")]
     public Image itemIcon;
     public Text amountText;
     public GameObject emptySlotImage;
@@ -19,10 +18,10 @@ public class InventorySlot : MonoBehaviour
     void Start()
     {
         UpdateSlotUI();
-        slotButton.onClick.AddListener(OnslotClick);
+        slotButton.onClick.AddListener(OnSlotClick);
     }
 
-    void OnslotClick()
+    void OnSlotClick()
     {
         if (item != null)
         {
@@ -30,13 +29,16 @@ public class InventorySlot : MonoBehaviour
         }
     }
 
-
-    //슬롯에 아이템 설정하는 함수
-    // Update is called once per frame
     public void SetItem(ItemData newItem, int newAmount)
     {
         item = newItem;
         amount = newAmount;
+        UpdateSlotUI();
+    }
+    // Update is called once per frame
+    void Update()
+    {
+        
     }
 
     public void AddAmount(int value)
@@ -48,6 +50,7 @@ public class InventorySlot : MonoBehaviour
     public void RemoveAmount(int value)
     {
         amount -= value;
+
         if (amount <= 0)
         {
             ClearSlot();
@@ -58,14 +61,13 @@ public class InventorySlot : MonoBehaviour
         }
     }
 
-
     public void ClearSlot()
     {
         item = null;
         amount = 0;
         UpdateSlotUI();
-    }
 
+    }
 
     void UpdateSlotUI()
     {
@@ -79,11 +81,10 @@ public class InventorySlot : MonoBehaviour
             {
                 emptySlotImage.SetActive(false);
             }
-
         }
         else
         {
-            itemIcon.enabled = false;
+            itemIcon.enabled=false;
             amountText.text = "";
             if (emptySlotImage != null)
             {

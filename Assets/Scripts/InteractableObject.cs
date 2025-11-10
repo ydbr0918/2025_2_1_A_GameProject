@@ -5,9 +5,9 @@ using UnityEngine;
 public class InteractableObject : MonoBehaviour
 {
     [Header("상호작용 정보")]
-    public string objectName = "아이템";
-    public string interactionText = "[E] 상호작용";
-    public InteractionType interactionType = InteractionType.Item;            //타입은 우선 Item
+    public string objectName = "아이템 ";
+    public string interactionText = "[E} 상호작용";
+    public InteractionType interactionType = InteractionType.item;
 
     [Header("하이라이트 설정")]
     public Color highlightColor = Color.yellow;
@@ -20,11 +20,11 @@ public class InteractableObject : MonoBehaviour
 
     public enum InteractionType
     {
-        Item,       //아이템
-        Machine,    //기계
-        Building,    //건물
-        NPC,     //NPC
-        Collectible   //수집품
+        item,
+        Machine,
+        Building,
+        NPC,
+        Collectible
     }
 
     protected virtual void Start()
@@ -38,24 +38,21 @@ public class InteractableObject : MonoBehaviour
         gameObject.layer = 8;
     }
 
-    public virtual void OnPlayerEnter()
+    public virtual void onPlayerEnter()
     {
-        Debug.Log($"[{objectName})감지됨");
         HighlightObject();
     }
 
-    public virtual void OnPlayerExit()
+    public virtual void onPlayerExit()
     {
-        Debug.Log($"[{objectName}] 범위에서 벗어남");
         RemoveHighlight();
     }
 
     public virtual void Interact()
     {
-        //상호작용 타입에 따른 기본 동작
         switch (interactionType)
         {
-            case InteractionType.Item:
+            case InteractionType.item:
                 CollectItem();
                 break;
             case InteractionType.Machine:
@@ -67,7 +64,57 @@ public class InteractableObject : MonoBehaviour
             case InteractionType.Collectible:
                 CollectItem();
                 break;
+
         }
+    }
+
+    protected virtual void HighlightObject()
+   {
+        if (objectRenderer != null && !isHighlighted)
+        {
+            objectRenderer.material.color = highlightColor;
+            objectRenderer.material.SetFloat("_Emission", highlightIntensity);
+            isHighlighted = true;
+        }
+   }
+
+   protected virtual void RemoveHighlight()
+   {
+        if (objectRenderer != null && isHighlighted)
+        {
+            objectRenderer.material.color = originalColor;
+            objectRenderer.material.SetFloat("_Emission", 0f);
+            isHighlighted = false;
+        }
+   }
+    
+       
+   protected virtual void CollectItem()
+   {
+        Debug.Log($"{objectName}을(를) 획득했습니다");
+        if (objectRenderer != null)
+        {
+            objectRenderer.material.color = Color.green;
+        }
+   }
+    protected virtual void OperateMachine()
+    {
+        Debug.Log($"{objectName}을 작동시켰습니다");
+        if (objectRenderer != null)
+        {
+            objectRenderer.material.color = Color.green;
+        }
+    }
+    protected virtual void AccessBuilding()
+    {
+        Debug.Log($"{objectName}와 대화를 시작합니다");
+        transform.Rotate(Vector3.up * 90f);
+        
+    }
+
+    protected virtual void TalkToNPC()
+    {
+        Debug.Log($"{objectName}와 대화를 시작합니다");
     }
 
     public string GetInteractionText()
@@ -76,57 +123,4 @@ public class InteractableObject : MonoBehaviour
     }
 
 
-    protected virtual void HighlightObject()
-    {   
-        if (objectRenderer != null && !isHighlighted)
-        {
-            objectRenderer.material.color = highlightColor;
-            objectRenderer.material.SetFloat("_Emission", highlightIntensity);
-            isHighlighted = true;
-        }
-    }
-
-
-    protected virtual void RemoveHighlight()
-    {
-        // 기존: if (objectRenderer != null && !isHighlighted)
-        if (objectRenderer != null && isHighlighted)
-        {
-            objectRenderer.material.color = originalColor;
-
-            // Emission 비활성화까지 제대로
-            if (objectRenderer.material.HasProperty("_EmissionColor"))
-            {
-                objectRenderer.material.SetColor("_EmissionColor", Color.black);
-                objectRenderer.material.DisableKeyword("_EMISSION");
-            }
-
-            isHighlighted = false;
-        }
-    }
-    protected virtual void CollectItem()
-    {
-        Debug.Log($"{objectName}을(를) 획득했습니다!");
-        Destroy(gameObject);
-    }
-
-    protected virtual void OperateMachine()
-    {
-        Debug.Log($"{objectName}을(를) 작동시켰습니다.!");
-        if (objectRenderer != null)
-        {
-            objectRenderer.material.color = Color.green;
-        }
-    }
-
-    protected virtual void AccessBuilding()
-    {
-        Debug.Log($"{objectName}을(를) 에 접근했습니다.");
-        transform.Rotate(Vector3.up * 90f);
-    }
-
-    protected virtual void TalkToNPC()
-    {
-        Debug.Log($"{objectName}와 대화를 시작합니다.");
-    }
 }

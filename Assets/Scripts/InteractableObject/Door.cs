@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Door : InteractableObject
 {
-
     [Header("문 설정")]
     public bool isOpen = false;
     public Vector3 openPosition;
@@ -12,17 +11,15 @@ public class Door : InteractableObject
 
     private Vector3 closedPosition;
 
-
-    // Start is called before the first frame update
     protected override void Start()
     {
-        base.Start();
+        base.Start();                   //기존에 상속받은 스타트 함수를 한번 실행
         objectName = "문";
         interactionText = "[E] 문 열기";
         interactionType = InteractionType.Building;
 
         closedPosition = transform.position;
-        openPosition = closedPosition + Vector3.right * 3f;
+        openPosition = closedPosition + Vector3.right * 3f; //오른쪽으로 3만큼 이동
     }
 
     protected override void AccessBuilding()
@@ -30,7 +27,6 @@ public class Door : InteractableObject
         isOpen = !isOpen;
         if (isOpen)
         {
-
             interactionText = "[E] 문 닫기";
             StartCoroutine(MoveDoor(openPosition));
         }
@@ -45,7 +41,7 @@ public class Door : InteractableObject
     {
         while (Vector3.Distance(transform.position, targetPosition) > 0.1f)
         {
-            transform.position = Vector3.MoveTowards(transform.position, targetPosition, openSpeed * Time.deltaTime);
+            transform.position = Vector3.MoveTowards(transform.position, targetPosition, openSpeed * Time.deltaTime);  
             yield return null;
         }
         transform.position = targetPosition;
